@@ -1,4 +1,13 @@
 <top-bar></top-bar>
 <StackLayout>
-    <task-list></task-list>
+    <TabView selectedTabTextColor="white" tabBackgroundColor="#1d62cf"
+         tabTextFontSize="18" androidTabsPosition="bottom"
+         androidSelectedTabHighlightColor="white" class="fas">
+        <StackLayout *tabItem="{title: '&#xf0ca;'}">
+            <task-list></task-list>
+        </StackLayout>
+        <StackLayout *tabItem="{title: '&#xf46c;'}">
+            <Label text="Complete task" textWrap="true"></Label>
+        </StackLayout>
+    </TabView>
 </StackLayout>
