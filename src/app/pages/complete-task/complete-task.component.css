@@ -1,0 +1,30 @@
+
+.container {
+    margin: 30px;
+}
+
+.heading {
+    margin: 20px 20px 20px 30px;
+    color: white;
+    font-size: 25px;
+}
+
+.date-title {
+    margin: 5px;
+    padding: 30px;
+    font-size: 18px;
+    border-radius: 50px;
+    color: #1d62cf;
+    background-color: white;
+}
+
+.count {
+    color: white;
+    background-color: #1d62cf;
+}
+
+.arrow {
+    color: #1d62cf;
+    border-width: 0;
+    z-index: 0;
+}

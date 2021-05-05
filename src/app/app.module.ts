@@ -18,6 +18,7 @@ import { AddTaskComponent } from './pages/add-task/add-task.component'
 import { EditTaskComponent } from './pages/edit-task/edit-task.component'
 import { PhotoViewerComponent } from './pages/photo-viewer/photo-viewer.component'
 import { AboutUsComponent } from './pages/about-us/about-us.component'
+import { CompleteTaskComponent } from './pages/complete-task/complete-task.component'
 
 import { TaskService } from './task.service'
 import { DatePipe } from '@angular/common'
@@ -42,6 +43,7 @@ import { DatePipe } from '@angular/common'
     EditTaskComponent,
     PhotoViewerComponent,
     AboutUsComponent,
+    CompleteTaskComponent,
   ],
   providers: [TaskService, DatePipe],
   schemas: [NO_ERRORS_SCHEMA],
