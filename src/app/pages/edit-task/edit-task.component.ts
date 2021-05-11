@@ -55,7 +55,7 @@ export class EditTaskComponent {
         datetime < now ? overdue=true : overdue=false
 
         this.taskService.editTask(this.task.id,this.task_name, this.task_detail, datetime, this.task_photo, 
-            this.task_notify, overdue, false)
+            this.task_notify, overdue)
         this.location.back()
     }
     

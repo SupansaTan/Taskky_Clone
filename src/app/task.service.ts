@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { DatePipe } from "@angular/common";
 import * as AppSettings from '@nativescript/core/application-settings'
 import { convertHSLToRGBColor } from '@nativescript/core/css/parser';
 import { LocalNotifications } from '@nativescript/local-notifications';
@@ -9,19 +10,30 @@ import { Task } from './task'
 })
 export class TaskService {
     private tasks: Array<any>;
+    private tasks_complete : Array<any>
 
-    public constructor() { 
+    public constructor(private datepipe : DatePipe) { 
         const openFirstTime = AppSettings.getBoolean("FistTime");
 
         /* check using app first time or not */
         if(openFirstTime == null || openFirstTime == undefined){
             this.tasks = []
+            this.tasks_complete = []
             AppSettings.setString("TaskData", JSON.stringify(this.tasks)); // store tasks data
+            AppSettings.setString("TaskCompleteData", JSON.stringify(this.tasks_complete)); // store tasks complete data
             AppSettings.setBoolean("FistTime", false);
         }
         else {
             this.tasks = JSON.parse(AppSettings.getString("TaskData")); // get task data that store in app settings
+            this.tasks_complete = JSON.parse(AppSettings.getString("TaskCompleteData")); // get tasks complete data that store in app settings
             this.tasks.forEach((task) => {task.due_date = new Date(Date.parse(task.due_date))}) // convert from string to Date type
+            
+            if (this.tasks_complete.length > 0){
+                this.tasks_complete.forEach((task) => {
+                    task.date = new Date(Date.parse(task.date))
+                    task.tasks.date = new Date(Date.parse(task.tasks.date))
+                })
+            }
         }
     }
 
@@ -30,11 +42,16 @@ export class TaskService {
     }
 
     public checklist(id: number){
-        this.tasks.find(task => task.id == id).complete = true
+        this.addCompleteTask(this.tasks.filter(x => x.id == id)[0])
+        this.deleteTask(id)
     }
 
     public getTasks(): Array<any> {
         return this.tasks;
+    }
+
+    public getCompleteTasks(): Array<any> {
+        return this.tasks_complete
     }
 
     public getTask(id: number){
@@ -42,7 +59,7 @@ export class TaskService {
     }
 
     public addTask(name: string, detail:string, datetime:Date, photoPath:Array<string>, 
-        notify:boolean, overdue:boolean, complete:boolean){
+        notify:boolean, overdue:boolean){
         let last_id: number;
         
         /* get id */
@@ -56,7 +73,6 @@ export class TaskService {
               'photo': photoPath,
               'notify': notify,
               'overdue': overdue,
-              'complete': complete
             }
         );
         this.tasks.sort((a, b) => a.due_date < b.due_date ? -1 : a.due_date > b.due_date ? 1 : 0) // sort tasks by due date
@@ -68,8 +84,32 @@ export class TaskService {
         }
     }
 
+    public addCompleteTask(task){
+        let task_date = this.datepipe.transform(task.due_date, 'dd/MM/yyyy')
+        let date_exist = this.tasks_complete.find(item => 
+            this.datepipe.transform(item.date, 'dd/MM/yyyy') == task_date)
+        let task_exist = this.tasks_complete.find(item => 
+            item.date==task.due_date && item.tasks.find(t => t.id == task.id)
+        )
+
+        if (date_exist && !task_exist){
+            // date exist in list
+            date_exist.tasks.push(task)
+        }
+        else{
+            this.tasks_complete.push(
+                {
+                    date: task.due_date, 
+                    tasks: [task],
+                    hide_task: false
+                }
+            )
+        }
+        AppSettings.setString("TaskCompleteData", JSON.stringify(this.tasks_complete));
+    }
+
     public editTask(id:number, name: string, detail:string, datetime:Date, photoPath:Array<string>, 
-        notify:boolean, overdue:boolean, complete: boolean){
+        notify:boolean, overdue:boolean){
         this.tasks[id] = {
             'id': id,
             'name': name,
@@ -78,7 +118,6 @@ export class TaskService {
             'photo': photoPath,
             'notify': notify,
             'overdue': overdue,
-            'complete': complete
         }
         this.tasks.sort((a, b) => a.due_date < b.due_date ? -1 : a.due_date > b.due_date ? 1 : 0) // sort tasks by due date
         this.tasks.map(task => task.id = this.tasks.indexOf(task)) // reorder id

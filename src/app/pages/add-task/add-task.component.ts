@@ -48,7 +48,7 @@ export class AddTaskComponent {
             this.time.getHours(),this.time.getMinutes())
         datetime < now ? overdue=true : overdue=false // check datetime is overdue or not
         this.taskService.addTask(this.task_name, this.task_detail, datetime, this.task_photo, 
-            this.task_notify, overdue, false)
+            this.task_notify, overdue)
         this.location.back()
     }
  
