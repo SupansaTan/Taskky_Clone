@@ -1,8 +1,9 @@
 export interface Task {
     id: number;
     name: string;
-    date: string;
+    due_date: Date;
     photo: Array<String>;
     notify: boolean;
     overdue: boolean;
+    complete: boolean;
 }

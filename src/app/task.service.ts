@@ -29,6 +29,10 @@ export class TaskService {
         this.tasks.find(task => task.id == id).overdue = overdue
     }
 
+    public checklist(id: number){
+        this.tasks.find(task => task.id == id).complete = true
+    }
+
     public getTasks(): Array<any> {
         return this.tasks;
     }
@@ -37,7 +41,8 @@ export class TaskService {
         return this.tasks.filter(x => x.id == id)[0];
     }
 
-    public addTask(name: string, detail:string, datetime:Date, photoPath:Array<string>, notify:boolean, overdue:boolean){
+    public addTask(name: string, detail:string, datetime:Date, photoPath:Array<string>, 
+        notify:boolean, overdue:boolean, complete:boolean){
         let last_id: number;
         
         /* get id */
@@ -51,6 +56,7 @@ export class TaskService {
               'photo': photoPath,
               'notify': notify,
               'overdue': overdue,
+              'complete': complete
             }
         );
         this.tasks.sort((a, b) => a.due_date < b.due_date ? -1 : a.due_date > b.due_date ? 1 : 0) // sort tasks by due date
@@ -62,7 +68,8 @@ export class TaskService {
         }
     }
 
-    public editTask(id:number, name: string, detail:string, datetime:Date, photoPath:Array<string>, notify:boolean, overdue:boolean){
+    public editTask(id:number, name: string, detail:string, datetime:Date, photoPath:Array<string>, 
+        notify:boolean, overdue:boolean, complete: boolean){
         this.tasks[id] = {
             'id': id,
             'name': name,
@@ -71,6 +78,7 @@ export class TaskService {
             'photo': photoPath,
             'notify': notify,
             'overdue': overdue,
+            'complete': complete
         }
         this.tasks.sort((a, b) => a.due_date < b.due_date ? -1 : a.due_date > b.due_date ? 1 : 0) // sort tasks by due date
         this.tasks.map(task => task.id = this.tasks.indexOf(task)) // reorder id

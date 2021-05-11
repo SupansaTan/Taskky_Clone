@@ -2,22 +2,25 @@
 <GridLayout class="container" rows="auto,*" columns="*">
     <Label row="0" col="0" text="&#xf46c;  Completed Task" textWrap="true" class="fas heading"></Label>
     
-    <ListView row="1" col="0" [items]="tasks" class="list-group" separatorColor="transparent">
+    <ListView row="1" col="0" [items]="tasks_seperate_date" class="list-group" separatorColor="transparent">
         <ng-template let-item="item" let-odd="odd" let-even="even">
             <StackLayout>
-                <GridLayout class="date-title" rows="auto" columns="auto,auto,*">
-                    <Label row="0" col="0" [text]="item.name"></Label>
-                    <Button row="0" col="1" [text]="item.count" width="25" height="25" 
+                <GridLayout class="date-title" rows="auto,auto" columns="auto,auto,*">
+                    <Label row="0" col="0" [text]="item.date |date:'d/MM/yyyy'"></Label>
+                    <Button row="0" col="1" [text]="item.tasks.length" width="25" height="25" 
                         borderRadius="50" class="fas count">
                     </Button>
-                    <Button row="0" col="2" text="&#xf078;" width="25" height="25"
-                        class="fas arrow" horizontalAlignment="right" (tap)="arrowToggle($event)">
+                    <Button *ngIf="toggleButton==false" row="0" col="2" text="&#xf078;" width="25" height="25" 
+                        class="fas arrow" horizontalAlignment="right" (tap)="arrowToggle()">
+                    </Button>
+                    <Button *ngIf="toggleButton" row="0" col="2" text="&#xf077;" width="25" height="25"
+                        class="fas arrow" horizontalAlignment="right" (tap)="arrowToggle()">
                     </Button>
 
                     <!-- task list -->
-                    <GridLayout rows="" columns="">
-                        
-                    </GridLayout>
+                    <StackLayout row="1" col="0" colSpan="3">
+                        <task-complete-list [date]=now></task-complete-list>
+                    </StackLayout>
                 </GridLayout>
             </StackLayout>
         </ng-template>

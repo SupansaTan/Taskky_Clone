@@ -20,13 +20,13 @@ export class TaskListComponent implements AfterViewInit {
 
     public constructor(private router:Router,private taskService : TaskService, 
         public datepipe: DatePipe, public page: Page, private cdRef: ChangeDetectorRef,) { 
-        this.tasks = this.taskService.getTasks();
+        this.tasks = this.taskService.getTasks().filter(task => task.complete == false);
     }
 
     ngOnInit() {
         // auto refresh every one second
         this.updateSubscription = interval(1000).subscribe(
-            (val) => { this.tasks = this.taskService.getTasks();}
+            (val) => { this.tasks = this.taskService.getTasks().filter(task => task.complete == false);}
         );
     }
 
@@ -91,7 +91,7 @@ export class TaskListComponent implements AfterViewInit {
     checklist(id : number){
         this.checklist_id = id
         setTimeout(() => {
-            this.taskService.deleteTask(id)
+            this.taskService.checklist(id)
             this.checklist_id = undefined
         }, 300);
     }
