@@ -26,7 +26,9 @@ export class TaskService {
         else {
             this.tasks = JSON.parse(AppSettings.getString("TaskData")); // get task data that store in app settings
             this.tasks_complete = JSON.parse(AppSettings.getString("TaskCompleteData")); // get tasks complete data that store in app settings
-            this.tasks.forEach((task) => {task.due_date = new Date(Date.parse(task.due_date))}) // convert from string to Date type
+            
+            /* convert from string to Date type */
+            this.tasks.forEach((task) => {task.due_date = new Date(Date.parse(task.due_date))})
             
             if (this.tasks_complete.length > 0){
                 this.tasks_complete.forEach((task) => {
@@ -104,6 +106,7 @@ export class TaskService {
                     hide_task: false
                 }
             )
+            this.tasks_complete.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0) // sort tasks by due date
         }
         AppSettings.setString("TaskCompleteData", JSON.stringify(this.tasks_complete));
     }

@@ -6,7 +6,7 @@
         <ng-template let-item="item" let-odd="odd" let-even="even">
             <StackLayout>
                 <GridLayout class="date-title" rows="auto,auto" columns="auto,auto,*">
-                    <Label row="0" col="0" [text]="item.date |date:'d/MM/yyyy'"></Label>
+                    <Label row="0" col="0" [text]="convertDate(item.date)"></Label>
                     <Button row="0" col="1" [text]="item.tasks.length" width="25" height="25" 
                         borderRadius="50" class="fas count">
                     </Button>
