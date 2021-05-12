@@ -1,6 +1,5 @@
 import { DatePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
-import { Button, EventData } from "@nativescript/core";
 import { Subscription, interval } from "rxjs";
 
 import { TaskService } from "~/app/task.service";
@@ -13,10 +12,15 @@ import { TaskService } from "~/app/task.service";
 
 export class CompleteTaskComponent implements OnInit {
     tasks: Array<any> = []
+    task_checked: Array<any> = []
     private updateSubscription: Subscription;
 
     public constructor(private datepipe : DatePipe, private taskService: TaskService) {
         this.tasks = this.taskService.getCompleteTasks()
+        this.tasks.map(task => {
+            task.hide_task = true // hide all task name of each date
+            task.tasks.map(item => item.isChecked = false) // unchecked box all tasks
+        }) 
     }
 
     ngOnInit(){
@@ -50,5 +54,36 @@ export class CompleteTaskComponent implements OnInit {
     public arrowToggle(date: Date){
         let task = this.tasks.find(task => task.date == date)
         task.hide_task = !task.hide_task
+    }
+
+    public checkbox_toggle(isChecked: boolean, task_id: number, task_datetime: Date){
+        let date = this.datepipe.transform(task_datetime, 'dd/MM/yyyy') // get only date
+
+        if(!isChecked){
+            // checked box
+            this.task_checked.push(
+                {
+                    id: task_id,
+                    date: task_datetime
+                }
+            )
+        }
+        else{
+            // unchecked box
+            this.unchecked(task_id)
+        }
+        
+        /* change status isChecked */
+        let task = this.tasks.find(item => this.datepipe.transform(item.date, 'dd/MM/yyyy') == date).tasks
+        task.find(task => task.id == task_id).isChecked = !isChecked
+    }
+
+    public unchecked(id: number){
+        for(let i = 0; i < this.task_checked.length; i++) {
+            if(this.task_checked[i].id == id) {
+              this.task_checked.splice(i, 1);
+              break;
+            }
+        }
     }
 }

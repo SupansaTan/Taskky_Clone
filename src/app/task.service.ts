@@ -60,6 +60,10 @@ export class TaskService {
         return this.tasks.filter(x => x.id == id)[0];
     }
 
+    public getCompleteTask(date: Date): Array<any> {
+        return this.tasks_complete.filter(task => task.date == date)[0]
+    }
+
     public addTask(name: string, detail:string, datetime:Date, photoPath:Array<string>, 
         notify:boolean, overdue:boolean){
         let last_id: number;
@@ -103,7 +107,7 @@ export class TaskService {
                 {
                     date: task.due_date, 
                     tasks: [task],
-                    hide_task: false
+                    hide_task: true
                 }
             )
             this.tasks_complete.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0) // sort tasks by due date

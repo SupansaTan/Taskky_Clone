@@ -7,6 +7,7 @@ import { NativeScriptDateTimePickerModule } from "@nativescript/datetimepicker/a
 import { registerElement } from '@nativescript/angular';
 import { CardView } from '@nstudio/nativescript-cardview';
 import { NativeScriptMaterialBottomSheetModule } from "@nativescript-community/ui-material-bottomsheet/angular";
+import { TNSCheckBoxModule } from '@nstudio/nativescript-checkbox/angular';
 registerElement('CardView', () => CardView);
 registerElement('ImageZoom', () => require('@happones/nativescript-image-zoom').ImageZoom);
 
@@ -19,7 +20,6 @@ import { EditTaskComponent } from './pages/edit-task/edit-task.component'
 import { PhotoViewerComponent } from './pages/photo-viewer/photo-viewer.component'
 import { AboutUsComponent } from './pages/about-us/about-us.component'
 import { CompleteTaskComponent } from './pages/complete-task/complete-task.component'
-import { TaskCompleteListComponent } from './components/task-complete-list/task-complete-list.component'
 
 import { TaskService } from './task.service'
 import { DatePipe } from '@angular/common'
@@ -28,6 +28,7 @@ import { DatePipe } from '@angular/common'
 @NgModule({
   bootstrap: [AppComponent],
   imports: [
+    TNSCheckBoxModule,
     NativeScriptModule,
     AppRoutingModule, 
     NativeScriptFormsModule, 
@@ -45,7 +46,6 @@ import { DatePipe } from '@angular/common'
     PhotoViewerComponent,
     AboutUsComponent,
     CompleteTaskComponent,
-    TaskCompleteListComponent,
   ],
   providers: [TaskService, DatePipe],
   schemas: [NO_ERRORS_SCHEMA],

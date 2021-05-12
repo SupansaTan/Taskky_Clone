@@ -29,3 +29,14 @@
     z-index: 0;
     font-family: "Font Awesome 5 Free", "fa-solid-900";
 }
+
+.checkbox {
+    margin: 10px;
+}
+
+.select-all-btn {
+    color: white;
+    height: 5%;
+    border-radius: 25px;
+    background-color: #38ABFD;
+}
