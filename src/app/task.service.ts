@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { DatePipe } from "@angular/common";
 import * as AppSettings from '@nativescript/core/application-settings'
-import { convertHSLToRGBColor } from '@nativescript/core/css/parser';
 import { LocalNotifications } from '@nativescript/local-notifications';
 import { Task } from './task'
+import { isNumber } from '@nativescript/core/utils/types';
 
 @Injectable({
     providedIn: 'root'
@@ -91,14 +91,10 @@ export class TaskService {
     }
 
     public addCompleteTask(task){
-        let task_date = this.datepipe.transform(task.due_date, 'dd/MM/yyyy')
         let date_exist = this.tasks_complete.find(item => 
-            this.datepipe.transform(item.date, 'dd/MM/yyyy') == task_date)
-        let task_exist = this.tasks_complete.find(item => 
-            item.date==task.due_date && item.tasks.find(t => t.id == task.id)
-        )
+            item.date.getDate() == task.due_date.getDate())
 
-        if (date_exist && !task_exist){
+        if (date_exist){
             // date exist in list
             date_exist.tasks.push(task)
         }
@@ -109,6 +105,9 @@ export class TaskService {
                     tasks: [task],
                     hide_task: true
                 }
+            )
+            this.tasks_complete.forEach(complete_task => 
+                complete_task.tasks.map(task => task.id = complete_task.tasks.indexOf(task)) // reorder id
             )
             this.tasks_complete.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0) // sort tasks by due date
         }
@@ -147,6 +146,19 @@ export class TaskService {
         }
         this.tasks.map(task => task.id = this.tasks.indexOf(task)) // reorder id
         AppSettings.setString("TaskData", JSON.stringify(this.tasks))
+    }
+
+    public deleteCompleteTask(date_id: number): void;
+    public deleteCompleteTask(date_id: number, task_id: number): void;
+    public deleteCompleteTask(date_id: number, task_id?: number): void {
+        if(isNumber(task_id)){
+            this.tasks_complete[date_id].tasks.splice(task_id, 1)
+        }
+        else{
+            this.tasks_complete.splice(date_id, 1);
+            this.tasks_complete.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0) // sort tasks by due date
+        }
+        AppSettings.setString("TaskCompleteData", JSON.stringify(this.tasks_complete));
     }
 
     private setNotify(id:number, name:string, datetime:Date){

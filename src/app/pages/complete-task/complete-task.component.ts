@@ -11,15 +11,17 @@ import { TaskService } from "~/app/task.service";
 })
 
 export class CompleteTaskComponent implements OnInit {
-    tasks: Array<any> = []
+    complete_tasks: Array<any> = []
     task_checked: Array<any> = []
     private updateSubscription: Subscription;
 
     public constructor(private datepipe : DatePipe, private taskService: TaskService) {
-        this.tasks = this.taskService.getCompleteTasks()
-        this.tasks.map(task => {
-            task.hide_task = true // hide all task name of each date
-            task.tasks.map(item => item.isChecked = false) // unchecked box all tasks
+        this.complete_tasks = this.taskService.getCompleteTasks()
+        this.complete_tasks.map(complete_task => {
+            complete_task.hide_task = true // hide all task name of each date
+            complete_task.tasks.map(item => {
+                item.isChecked = false // unchecked box all tasks
+            })
         }) 
     }
 
@@ -27,7 +29,7 @@ export class CompleteTaskComponent implements OnInit {
         // auto refresh every one second
         this.updateSubscription = interval(1000).subscribe(
             (val) => { 
-                this.tasks = this.taskService.getCompleteTasks()
+                this.complete_tasks = this.taskService.getCompleteTasks()
             }
         );
     }
@@ -52,38 +54,67 @@ export class CompleteTaskComponent implements OnInit {
     }
 
     public arrowToggle(date: Date){
-        let task = this.tasks.find(task => task.date == date)
+        let task = this.complete_tasks.find(task => task.date == date)
         task.hide_task = !task.hide_task
     }
 
-    public checkbox_toggle(isChecked: boolean, task_id: number, task_datetime: Date){
-        let date = this.datepipe.transform(task_datetime, 'dd/MM/yyyy') // get only date
+    public checkbox_toggle(isChecked: boolean, task_name: string, task_datetime: Date){
 
         if(!isChecked){
             // checked box
-            this.task_checked.push(
-                {
-                    id: task_id,
-                    date: task_datetime
-                }
-            )
+            if(!this.task_checked.find(item => item.name==task_name && item.date==task_datetime)){
+                // when task info not exist in array => increase task info
+                this.task_checked.push(
+                    {
+                        name: task_name,
+                        date: task_datetime
+                    }
+                )
+            }
         }
         else{
             // unchecked box
-            this.unchecked(task_id)
+            this.unchecked(task_name, task_datetime)
         }
-        
-        /* change status isChecked */
-        let task = this.tasks.find(item => this.datepipe.transform(item.date, 'dd/MM/yyyy') == date).tasks
-        task.find(task => task.id == task_id).isChecked = !isChecked
+
     }
 
-    public unchecked(id: number){
+    public unchecked(name: string, datetime: Date){
         for(let i = 0; i < this.task_checked.length; i++) {
-            if(this.task_checked[i].id == id) {
-              this.task_checked.splice(i, 1);
+            if(this.task_checked[i].name==name && this.task_checked[i].date == datetime) {
+              this.task_checked.splice(i, 1); // remove task info in task_checked array
               break;
             }
         }
+    }
+
+    public deleteTask(){
+        /* delete each task in completed tasks */
+        this.task_checked.forEach(task => {
+            for(let i = 0; i < this.complete_tasks.length; i++) {
+                for(let j = 0; j < this.complete_tasks[i].tasks.length; j++) {
+                    let get_due_date = new Date(Date.parse(this.complete_tasks[i].tasks[j].due_date))
+                    let task_checked_date = new Date(Date.parse(task.date))
+
+                    /* date and task name as same */
+                    if((this.complete_tasks[i].date.getDate() == get_due_date.getDate())
+                     && (this.complete_tasks[i].tasks[j].name == task.name) &&
+                     (get_due_date.getTime() == task_checked_date.getTime())) {
+                        
+                        if(this.complete_tasks[i].tasks.length <= 1){ // the last task in that date
+                            this.taskService.deleteCompleteTask(i) // delete both of that date and task
+                            break;
+                        }
+                        else{
+                            this.taskService.deleteCompleteTask(i,j) // delete the task
+                            break;
+                        }
+                    }
+                }
+            }
+        })
+
+        /* clear array */
+        this.task_checked = []
     }
 }
