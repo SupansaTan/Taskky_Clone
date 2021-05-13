@@ -1,5 +1,5 @@
 import { DatePipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { AfterViewChecked, ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { Subscription, interval } from "rxjs";
 
 import { TaskService } from "~/app/task.service";
@@ -10,12 +10,13 @@ import { TaskService } from "~/app/task.service";
     styleUrls: ['./complete-task.component.css'],
 })
 
-export class CompleteTaskComponent implements OnInit {
+export class CompleteTaskComponent implements AfterViewChecked {
     complete_tasks: Array<any> = []
     task_checked: Array<any> = []
     private updateSubscription: Subscription;
 
-    public constructor(private datepipe : DatePipe, private taskService: TaskService) {
+    public constructor(private datepipe : DatePipe, private taskService: TaskService, 
+        private cdRef: ChangeDetectorRef ) {
         this.complete_tasks = this.taskService.getCompleteTasks()
         this.complete_tasks.map(complete_task => {
             complete_task.hide_task = true // hide all task name of each date
@@ -25,13 +26,8 @@ export class CompleteTaskComponent implements OnInit {
         }) 
     }
 
-    ngOnInit(){
-        // auto refresh every one second
-        this.updateSubscription = interval(1000).subscribe(
-            (val) => { 
-                this.complete_tasks = this.taskService.getCompleteTasks()
-            }
-        );
+    ngAfterViewChecked(): void {
+        this.cdRef.detectChanges()
     }
 
     public convertDate(date: Date){
@@ -58,7 +54,7 @@ export class CompleteTaskComponent implements OnInit {
         task.hide_task = !task.hide_task
     }
 
-    public checkbox_toggle(isChecked: boolean, task_name: string, task_datetime: string){
+    public checkboxToggle(isChecked: boolean, task_name: string, task_datetime: string){
         let datetime = new Date(Date.parse(task_datetime))
 
         if(!isChecked){
@@ -140,7 +136,8 @@ export class CompleteTaskComponent implements OnInit {
                     if(t.name == current_task.name && t.date.getDate() == due_date.getDate()){
                         
                         this.taskService.addTask(current_task.name, current_task.detail, 
-                            due_date, current_task.photo, current_task.notify, current_task.overdue)
+                            due_date, current_task.photo, current_task.notify, 
+                            current_task.overdue, current_task.tags)
                         
                         if(this.complete_tasks[i].tasks.length <= 1){ // the last task in that date
                             this.taskService.deleteCompleteTask(i) // delete both of that date and task
@@ -156,4 +153,5 @@ export class CompleteTaskComponent implements OnInit {
         /* clear array */
         this.task_checked = []
     }
+
 }

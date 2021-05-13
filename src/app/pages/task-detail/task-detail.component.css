@@ -36,3 +36,18 @@ Label {
     font-weight: 500;
     color: #1872b3;
 }
+
+.tag-title {
+    font-size: 18px;
+}
+
+.tag-btn {
+    width: auto;
+    height: 80px;
+    color: #1d62cf;
+    font-size: 14px;
+    border-radius: 50px;
+    background-color: #F2F2F7;
+    border-width : 1;
+    border-color: #1d62cf;
+}

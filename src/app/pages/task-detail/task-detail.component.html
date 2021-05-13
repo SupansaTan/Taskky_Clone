@@ -7,10 +7,18 @@
         <label row="1" col="1" [text]="task.due_date|date:'d/MM/yyyy HH:mm'" class="content"></label>
 
         <label row="2" col="0" colSpan="2" text="About" class="topic" *ngIf="task.photo.length>0 || task.detail"></label>
-        <GridLayout row="3" col="0" colSpan="2" rows="auto,auto" columns="*" class="about-container">
+        <GridLayout *ngIf="task.tags" row="3" col="0" colSpan="2" rows="auto,auto,auto" columns="*" class="about-container">
             <label row="0" col="0" *ngIf="task.detail" [text]="task.detail" class="content"></label>
+            
+            <DockLayout row="1" col="0" stretchLastChild="true">
+                <Label text="&#xf02b; tags :" class="fas tag-title" dock="left"></Label>
 
-            <ScrollView row="1" col="0" orientation="horizontal">
+                <DockLayout *ngFor="let tag of task.tags" stretchLastChild="true" dock="left">
+                    <button [text]="tag" class="tag-btn" dock="left"></button>
+                </DockLayout>
+            </DockLayout>
+
+            <ScrollView row="2" col="0" orientation="horizontal">
                 <StackLayout orientation="horizontal" *ngIf="task.photo">
                     <GridLayout *ngFor="let photo of task.photo" rows="*" columns="auto">
                         <CardView margin="5" elevation="15" radius="25">

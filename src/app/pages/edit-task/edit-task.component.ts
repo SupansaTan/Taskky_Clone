@@ -3,7 +3,7 @@ import { Component } from "@angular/core";
 import { TaskService } from "~/app/task.service";
 import { Location } from '@angular/common'
 import * as camera from "@nativescript/camera";
-import { ImageAsset } from "@nativescript/core";
+import { Button, Color, EventData, ImageAsset } from "@nativescript/core";
 import { ImageSource, knownFolders} from '@nativescript/core';
 import { flatMap, map } from 'rxjs/operators';
 import { from } from 'rxjs';
@@ -20,6 +20,7 @@ export class EditTaskComponent {
     task;
     date: Date;
     time: Date;
+    tags: Array<string>
     task_name: string;
     task_detail: string;
     task_date: Date;
@@ -41,6 +42,7 @@ export class EditTaskComponent {
                 this.task_notify = this.task.notify
                 this.date = this.task.due_date
                 this.time = this.task.due_date
+                this.tags = this.task.tags
     }
     
     ngOnInit() {
@@ -55,8 +57,26 @@ export class EditTaskComponent {
         datetime < now ? overdue=true : overdue=false
 
         this.taskService.editTask(this.task.id,this.task_name, this.task_detail, datetime, this.task_photo, 
-            this.task_notify, overdue)
+            this.task_notify, overdue, this.tags)
         this.location.back()
+    }
+
+    public tagsToggle(args: EventData){
+        const button = args.object as Button
+        let tag_exist = this.tags.find(tag => tag == button.text)
+
+        if(tag_exist){
+            this.tags.splice(this.tags.indexOf(tag_exist), 1) // remove tag selected
+            button.backgroundColor = '#F2F2F7'
+            button.color = new Color('#1d62cf')
+            button.borderColor = '#1d62cf'
+        }
+        else {
+            this.tags.push(button.text) // add tag selected
+            button.backgroundColor = '#1d62cf'
+            button.color = new Color('#F2F2F7')
+            button.borderColor = '#F2F2F7'
+        }
     }
     
     public getRandomString() {

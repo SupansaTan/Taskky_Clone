@@ -3,7 +3,7 @@ import { TaskService } from "~/app/task.service";
 import { DatePipe } from '@angular/common'
 import { Location } from '@angular/common'
 import * as camera from "@nativescript/camera";
-import { ImageAsset } from "@nativescript/core";
+import { ImageAsset, Button, EventData, Color } from "@nativescript/core";
 import { ImageSource, knownFolders} from '@nativescript/core';
 import { flatMap, map } from 'rxjs/operators';
 import { from } from 'rxjs';
@@ -29,6 +29,7 @@ export class AddTaskComponent {
     date : Date;
     time : Date;
     task_notify: boolean;
+    tags : Array<string> = []
 
     imagePath: string | undefined;
 
@@ -48,12 +49,30 @@ export class AddTaskComponent {
             this.time.getHours(),this.time.getMinutes())
         datetime < now ? overdue=true : overdue=false // check datetime is overdue or not
         this.taskService.addTask(this.task_name, this.task_detail, datetime, this.task_photo, 
-            this.task_notify, overdue)
+            this.task_notify, overdue, this.tags)
         this.location.back()
     }
  
     public toggleVisible(){
         this.showButtons = !this.showButtons;
+    }
+
+    public tagsToggle(args: EventData){
+        const button = args.object as Button
+        let tag_exist = this.tags.find(tag => tag == button.text)
+
+        if(tag_exist){
+            this.tags.splice(this.tags.indexOf(tag_exist), 1) // remove tag selected
+            button.backgroundColor = '#F2F2F7'
+            button.color = new Color('#1d62cf')
+            button.borderColor = '#1d62cf'
+        }
+        else {
+            this.tags.push(button.text) // add tag selected
+            button.backgroundColor = '#1d62cf'
+            button.color = new Color('#F2F2F7')
+            button.borderColor = '#F2F2F7'
+        }
     }
 
     public deletePhoto(path: string){

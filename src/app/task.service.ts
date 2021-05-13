@@ -65,7 +65,7 @@ export class TaskService {
     }
 
     public addTask(name: string, detail:string, datetime:Date, photoPath:Array<string>, 
-        notify:boolean, overdue:boolean){
+        notify:boolean, overdue:boolean, tags: Array<string>){
         let last_id: number;
         
         /* get id */
@@ -79,6 +79,7 @@ export class TaskService {
               'photo': photoPath,
               'notify': notify,
               'overdue': overdue,
+              'tags': tags,
             }
         );
         this.tasks.sort((a, b) => a.due_date < b.due_date ? -1 : a.due_date > b.due_date ? 1 : 0) // sort tasks by due date
@@ -106,7 +107,7 @@ export class TaskService {
                     hide_task: true
                 }
             )
-            
+
             this.tasks_complete.map(complete_task => {
                 complete_task.tasks.map(item => {
                     item.isChecked = false // unchecked box all tasks
@@ -118,7 +119,7 @@ export class TaskService {
     }
 
     public editTask(id:number, name: string, detail:string, datetime:Date, photoPath:Array<string>, 
-        notify:boolean, overdue:boolean){
+        notify:boolean, overdue:boolean, tags: Array<string>){
         this.tasks[id] = {
             'id': id,
             'name': name,
@@ -127,6 +128,7 @@ export class TaskService {
             'photo': photoPath,
             'notify': notify,
             'overdue': overdue,
+            'tags': tags,
         }
         this.tasks.sort((a, b) => a.due_date < b.due_date ? -1 : a.due_date > b.due_date ? 1 : 0) // sort tasks by due date
         this.tasks.map(task => task.id = this.tasks.indexOf(task)) // reorder id
