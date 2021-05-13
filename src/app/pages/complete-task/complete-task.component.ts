@@ -58,30 +58,40 @@ export class CompleteTaskComponent implements OnInit {
         task.hide_task = !task.hide_task
     }
 
-    public checkbox_toggle(isChecked: boolean, task_name: string, task_datetime: Date){
+    public checkbox_toggle(isChecked: boolean, task_name: string, task_datetime: string){
+        let datetime = new Date(Date.parse(task_datetime))
 
         if(!isChecked){
             // checked box
-            if(!this.task_checked.find(item => item.name==task_name && item.date==task_datetime)){
+            if(!this.task_checked.find(task => task.name==task_name && task.date.getDate()==datetime.getDate())){
                 // when task info not exist in array => increase task info
                 this.task_checked.push(
                     {
                         name: task_name,
-                        date: task_datetime
+                        date: datetime
                     }
                 )
             }
         }
         else{
             // unchecked box
-            this.unchecked(task_name, task_datetime)
+            this.unchecked(task_name, datetime)
         }
+
+        /* update isChecked value */
+        let complete_task = this.complete_tasks.find(complete_task => complete_task.date.getDate() == datetime.getDate())
+        complete_task.tasks.forEach(task => {
+
+            if(task.name == task_name){
+                task.isChecked = !task.isChecked
+            }
+        })
 
     }
 
     public unchecked(name: string, datetime: Date){
         for(let i = 0; i < this.task_checked.length; i++) {
-            if(this.task_checked[i].name==name && this.task_checked[i].date == datetime) {
+            if(this.task_checked[i].name==name && this.task_checked[i].date.getDate() == datetime.getDate()) {
               this.task_checked.splice(i, 1); // remove task info in task_checked array
               break;
             }
@@ -93,13 +103,13 @@ export class CompleteTaskComponent implements OnInit {
         this.task_checked.forEach(task => {
             for(let i = 0; i < this.complete_tasks.length; i++) {
                 for(let j = 0; j < this.complete_tasks[i].tasks.length; j++) {
-                    let get_due_date = new Date(Date.parse(this.complete_tasks[i].tasks[j].due_date))
+                    let task_due_date = new Date(Date.parse(this.complete_tasks[i].tasks[j].due_date))
                     let task_checked_date = new Date(Date.parse(task.date))
 
                     /* date and task name as same */
-                    if((this.complete_tasks[i].date.getDate() == get_due_date.getDate())
+                    if((this.complete_tasks[i].date.getDate() == task_due_date.getDate())
                      && (this.complete_tasks[i].tasks[j].name == task.name) &&
-                     (get_due_date.getTime() == task_checked_date.getTime())) {
+                     (task_due_date.getTime() == task_checked_date.getTime())) {
                         
                         if(this.complete_tasks[i].tasks.length <= 1){ // the last task in that date
                             this.taskService.deleteCompleteTask(i) // delete both of that date and task
@@ -113,6 +123,35 @@ export class CompleteTaskComponent implements OnInit {
                 }
             }
         })
+
+        /* clear array */
+        this.task_checked = []
+    }
+
+    public restoreTask(){
+        for(let i = 0; i < this.complete_tasks.length; i++){
+            for(let j = 0; j < this.complete_tasks[i].tasks.length; j++){
+                
+                let current_task = this.complete_tasks[i].tasks[j]
+                let due_date = new Date(Date.parse(current_task.due_date))
+
+                this.task_checked.forEach(t => {
+
+                    if(t.name == current_task.name && t.date.getDate() == due_date.getDate()){
+                        
+                        this.taskService.addTask(current_task.name, current_task.detail, 
+                            due_date, current_task.photo, current_task.notify, current_task.overdue)
+                        
+                        if(this.complete_tasks[i].tasks.length <= 1){ // the last task in that date
+                            this.taskService.deleteCompleteTask(i) // delete both of that date and task
+                        }
+                        else{
+                            this.taskService.deleteCompleteTask(i,j) // delete the task
+                        }
+                    }
+                })
+            }
+        }
 
         /* clear array */
         this.task_checked = []

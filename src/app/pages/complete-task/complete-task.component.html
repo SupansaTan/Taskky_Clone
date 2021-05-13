@@ -2,11 +2,12 @@
 <GridLayout class="container" rows="auto,auto,*" columns="*,*,*">
     <Label row="0" col="0" colSpan="3" text="&#xf46c;  Completed Task" textWrap="true" class="fas heading"></Label>
     
-    <Button *ngIf="complete_tasks.length>0" row="1" col="0" text="Mark Uncompleted" class="select-all-btn"></Button>
-    <Button *ngIf="complete_tasks.length>0" row="1" col="1" text="Delete" (tap)="deleteTask()" class="select-all-btn"></Button>
-    <Button *ngIf="complete_tasks.length>0" row="1" col="2" text="Select all" class="select-all-btn"></Button>
+    <Button *ngIf="complete_tasks.length>0" row="1" col="0" text="Mark Uncompleted" (tap)="restoreTask()" class="btn"></Button>
+    <Button *ngIf="complete_tasks.length>0" row="1" col="1" text="Delete" (tap)="deleteTask()" class="btn"></Button>
+    <Button *ngIf="complete_tasks.length>0" row="1" col="2" text="Select all" class="btn"></Button>
 
-    <ListView row="2" col="0" colSpan="3" [items]="complete_tasks" class="list-group" separatorColor="transparent">
+    <ListView *ngIf="complete_tasks.length>0" row="2" col="0" colSpan="3" [items]="complete_tasks" class="list-group" 
+        separatorColor="transparent">
         <ng-template let-item="item" let-odd="odd" let-even="even">
             <StackLayout>
                 <GridLayout class="date-title" rows="auto,auto" columns="auto,auto,*">
@@ -24,7 +25,7 @@
                     <!-- all task name of each date -->
                     <StackLayout *ngIf="item.hide_task==false" row="1" col="0" colSpan="3" height="100%">
                         <GridLayout *ngFor="let task of item.tasks" class="task-names">
-                            <CheckBox #CB [text]="task.name" [(ngModel)]="task.isChecked" 
+                            <CheckBox #CB [text]="task.name" [checked]="task.isChecked" 
                             (checkedChange)="checkbox_toggle(task.isChecked, task.name, task.due_date)" class="checkbox">
                             </CheckBox>
                         </GridLayout>

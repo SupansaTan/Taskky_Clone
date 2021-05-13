@@ -31,9 +31,9 @@ export class TaskService {
             this.tasks.forEach((task) => {task.due_date = new Date(Date.parse(task.due_date))})
             
             if (this.tasks_complete.length > 0){
-                this.tasks_complete.forEach((task) => {
-                    task.date = new Date(Date.parse(task.date))
-                    task.tasks.date = new Date(Date.parse(task.tasks.date))
+                this.tasks_complete.forEach((complete_task) => {
+                    complete_task.date = new Date(Date.parse(complete_task.date))
+                    complete_task.tasks.date = new Date(Date.parse(complete_task.tasks.date))
                 })
             }
         }
@@ -106,9 +106,12 @@ export class TaskService {
                     hide_task: true
                 }
             )
-            this.tasks_complete.forEach(complete_task => 
-                complete_task.tasks.map(task => task.id = complete_task.tasks.indexOf(task)) // reorder id
-            )
+            
+            this.tasks_complete.map(complete_task => {
+                complete_task.tasks.map(item => {
+                    item.isChecked = false // unchecked box all tasks
+                })
+            }) 
             this.tasks_complete.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0) // sort tasks by due date
         }
         AppSettings.setString("TaskCompleteData", JSON.stringify(this.tasks_complete));
