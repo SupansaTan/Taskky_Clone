@@ -56,7 +56,7 @@ export class CompleteTaskComponent implements AfterViewChecked {
 
     public checkboxToggle(isChecked: boolean, task_name: string, task_datetime: string){
         let datetime = new Date(Date.parse(task_datetime))
-
+        //console.log(isChecked)
         if(!isChecked){
             // checked box
             if(!this.task_checked.find(task => task.name==task_name && task.date.getDate()==datetime.getDate())){
@@ -74,7 +74,8 @@ export class CompleteTaskComponent implements AfterViewChecked {
             this.unchecked(task_name, datetime)
         }
 
-        /* update isChecked value */
+        /*
+        //update isChecked value
         let complete_task = this.complete_tasks.find(complete_task => complete_task.date.getDate() == datetime.getDate())
         complete_task.tasks.forEach(task => {
 
@@ -82,7 +83,7 @@ export class CompleteTaskComponent implements AfterViewChecked {
                 task.isChecked = !task.isChecked
             }
         })
-
+        */
     }
 
     public unchecked(name: string, datetime: Date){
@@ -125,6 +126,7 @@ export class CompleteTaskComponent implements AfterViewChecked {
     }
 
     public restoreTask(){
+        /*
         for(let i = 0; i < this.complete_tasks.length; i++){
             for(let j = 0; j < this.complete_tasks[i].tasks.length; j++){
                 
@@ -145,10 +147,40 @@ export class CompleteTaskComponent implements AfterViewChecked {
                         else{
                             this.taskService.deleteCompleteTask(i,j) // delete the task
                         }
+                        this.task_checked.shift()
                     }
                 })
             }
         }
+        */
+        this.task_checked.forEach(task => {
+            for(let i = 0; i < this.complete_tasks.length; i++) {
+                for(let j = 0; j < this.complete_tasks[i].tasks.length; j++) {
+                    let task_due_date = new Date(Date.parse(this.complete_tasks[i].tasks[j].due_date))
+                    let task_checked_date = new Date(Date.parse(task.date))
+
+                    /* date and task name as same */
+                    if((this.complete_tasks[i].date.getDate() == task_due_date.getDate())
+                     && (this.complete_tasks[i].tasks[j].name == task.name) &&
+                     (task_due_date.getTime() == task_checked_date.getTime())) {
+
+                        let current_task = this.complete_tasks[i].tasks[j]
+                        this.taskService.addTask(current_task.name, current_task.detail, 
+                            task_due_date, current_task.photo, current_task.notify, 
+                            current_task.overdue, current_task.tags)
+                        
+                        if(this.complete_tasks[i].tasks.length <= 1){ // the last task in that date
+                            this.taskService.deleteCompleteTask(i) // delete both of that date and task
+                            break;
+                        }
+                        else{
+                            this.taskService.deleteCompleteTask(i,j) // delete the task
+                            break;
+                        }
+                    }
+                }
+            }
+        })
 
         /* clear array */
         this.task_checked = []
